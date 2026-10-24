@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+COPY inserther/package.json inserther/package-lock.json* ./
 RUN npm install
 
 COPY . .
