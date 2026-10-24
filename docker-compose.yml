@@ -4,6 +4,11 @@ services:
     ports:
       - "5781:8080"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4Gi
     env_file:
       - ./.env
     volumes:
