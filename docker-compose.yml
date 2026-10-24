@@ -31,8 +31,7 @@ services:
 
   inserther:
     build:
-      context: ./inserther
-      dockerfile: DOCKERFILE
+      dockerfile: ./inserther/DOCKERFILE
     restart: unless-stopped
     volumes:
       - ./.env:/app/.env:ro
