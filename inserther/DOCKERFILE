@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 1826
 
-CMD ["node", "server.js"]
+CMD ["node", "inserther/server.js"]
