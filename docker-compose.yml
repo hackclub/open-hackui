@@ -20,12 +20,11 @@ services:
       EXTERNAL_PWA_MANIFEST_URL: https://${PROXY_URL}/backend/manifest.json
 
   nginx-cors-proxy:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: NGINX.Dockerfile
     ports:
       - "8281:80"
-    volumes:
-      - ./nginx-proxy.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./manifest.json:/usr/share/nginx/html/manifest.json:ro
     restart: unless-stopped
     networks:
       - internal
