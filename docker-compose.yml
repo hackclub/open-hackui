@@ -7,8 +7,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "4"
-          memory: 8Gi
+          cpus: "2"
+          memory: 2Gi
     env_file:
       - ./.env
     volumes:
