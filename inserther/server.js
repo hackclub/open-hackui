@@ -101,7 +101,11 @@ async function updateUserSettings(userId, settings, userToken) {
 }
 
 app.post('/webhook', async (req, res) => {
-  console.log('Received webhook');
+  const email = req.body?.subject?.email ?? 'unknown email';
+  const slackId = req.body?.subject?.slack_id;
+  const who = slackId ? `${email} (${slackId})` : email;
+
+  console.log(`Received webhook for ${who}`);
 
   const userId = req.body?.subject?.id;
   
@@ -162,7 +166,7 @@ app.post('/webhook', async (req, res) => {
     }
 
     const updateResp = await updateUserSettings(userId, userSettings, userToken);
-    console.log(`Updated settings for user ${userId}`);
+    console.log(`Updated settings for ${who}`);
 
     res.status(200).send('Webhook received');
   } catch (err) {
