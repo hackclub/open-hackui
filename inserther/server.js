@@ -50,7 +50,6 @@ async function getDummyApiKey(user) {
     // if (!resp.ok) throw new Error(`Status ${resp.status}`);
     // const body = await resp.json();
     // return body.apiKey;
-    console.log('user:', user);
     const amsterdamTime = new Intl.DateTimeFormat('en-GB', {
       timeZone: 'Europe/Amsterdam',
       hour: '2-digit',
@@ -102,7 +101,7 @@ async function updateUserSettings(userId, settings, userToken) {
 }
 
 app.post('/webhook', async (req, res) => {
-  console.log('Received webhook:', req.body);
+  console.log('Received webhook');
 
   const userId = req.body?.subject?.id;
   
@@ -120,8 +119,6 @@ app.post('/webhook', async (req, res) => {
     process.env.WEBUI_SECRET_KEY,
     { expiresIn: '5m' }
   );
-
-  console.log('jwt token:', userToken);
 
   try {
     const apiKey = await getDummyApiKey(userId);
@@ -164,10 +161,8 @@ app.post('/webhook', async (req, res) => {
       userSettings.ui.directConnections.OPENAI_API_CONFIGS["0"].auth_type = "bearer";
     }
 
-    console.log(JSON.stringify(userSettings));
-
     const updateResp = await updateUserSettings(userId, userSettings, userToken);
-    console.log('Updated settings response:', updateResp);
+    console.log(`Updated settings for user ${userId}`);
 
     res.status(200).send('Webhook received');
   } catch (err) {

@@ -25,6 +25,8 @@ services:
       dockerfile: NGINX.Dockerfile
     ports:
       - "8281:80"
+    environment:
+      WEBUI_URL: ${WEBUI_URL}
     restart: unless-stopped
     networks:
       - internal
