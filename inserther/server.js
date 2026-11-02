@@ -50,7 +50,6 @@ async function getDummyApiKey(user) {
     // if (!resp.ok) throw new Error(`Status ${resp.status}`);
     // const body = await resp.json();
     // return body.apiKey;
-    console.log('user:', user);
     const amsterdamTime = new Intl.DateTimeFormat('en-GB', {
       timeZone: 'Europe/Amsterdam',
       hour: '2-digit',
@@ -68,7 +67,7 @@ async function getDummyApiKey(user) {
 
 async function getUserSettings(userId, userToken) {
   try {
-    const resp = await fetch(`https://chat.matthiaz.dev/api/v1/users/user/settings`, {
+    const resp = await fetch(`${process.env.WEBUI_URL}/api/v1/users/user/settings`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +84,7 @@ async function getUserSettings(userId, userToken) {
 
 async function updateUserSettings(userId, settings, userToken) {
   try {
-    const resp = await fetch(`https://chat.matthiaz.dev/api/v1/users/user/settings/update`, {
+    const resp = await fetch(`${process.env.WEBUI_URL}/api/v1/users/user/settings/update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +101,11 @@ async function updateUserSettings(userId, settings, userToken) {
 }
 
 app.post('/webhook', async (req, res) => {
-  console.log('Received webhook:', req.body);
+  const email = req.body?.subject?.email ?? 'unknown email';
+  const slackId = req.body?.subject?.slack_id;
+  const who = slackId ? `${email} (${slackId})` : email;
+
+  console.log(`Received webhook for ${who}`);
 
   const userId = req.body?.subject?.id;
   
@@ -121,8 +124,6 @@ app.post('/webhook', async (req, res) => {
     { expiresIn: '5m' }
   );
 
-  console.log('jwt token:', userToken);
-
   try {
     const apiKey = await getDummyApiKey(userId);
     // console.log('Fetched API key:', apiKey);
@@ -135,7 +136,7 @@ app.post('/webhook', async (req, res) => {
         ui: {
           directConnections: {
             OPENAI_API_BASE_URLS: [
-              "https://proxy.chat.matthiaz.dev/proxy/v1"
+              `https://${process.env.PROXY_URL}/proxy/v1`
             ],
             OPENAI_API_KEYS: [
               apiKey
@@ -157,17 +158,15 @@ app.post('/webhook', async (req, res) => {
         }
       };
     } else {
-      userSettings.ui.directConnections.OPENAI_API_BASE_URLS = ["https://proxy.chat.matthiaz.dev/proxy/v1"];
+      userSettings.ui.directConnections.OPENAI_API_BASE_URLS = [`https://${process.env.PROXY_URL}/proxy/v1`];
       userSettings.ui.directConnections.OPENAI_API_KEYS = [apiKey];
       userSettings.ui.directConnections.OPENAI_API_CONFIGS["0"].enable = true;
       userSettings.ui.directConnections.OPENAI_API_CONFIGS["0"].connection_type = "external";
       userSettings.ui.directConnections.OPENAI_API_CONFIGS["0"].auth_type = "bearer";
     }
 
-    console.log(JSON.stringify(userSettings));
-
     const updateResp = await updateUserSettings(userId, userSettings, userToken);
-    console.log('Updated settings response:', updateResp);
+    console.log(`Updated settings for ${who}`);
 
     res.status(200).send('Webhook received');
   } catch (err) {
