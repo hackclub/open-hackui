@@ -68,7 +68,7 @@ async function getDummyApiKey(user) {
 
 async function getUserSettings(userId, userToken) {
   try {
-    const resp = await fetch(`https://chat.matthiaz.dev/api/v1/users/user/settings`, {
+    const resp = await fetch(`${process.env.WEBUI_URL}/api/v1/users/user/settings`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ async function getUserSettings(userId, userToken) {
 
 async function updateUserSettings(userId, settings, userToken) {
   try {
-    const resp = await fetch(`https://chat.matthiaz.dev/api/v1/users/user/settings/update`, {
+    const resp = await fetch(`${process.env.WEBUI_URL}/api/v1/users/user/settings/update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ app.post('/webhook', async (req, res) => {
         ui: {
           directConnections: {
             OPENAI_API_BASE_URLS: [
-              "https://proxy.chat.matthiaz.dev/proxy/v1"
+              `https://${process.env.PROXY_URL}/proxy/v1`
             ],
             OPENAI_API_KEYS: [
               apiKey
@@ -157,7 +157,7 @@ app.post('/webhook', async (req, res) => {
         }
       };
     } else {
-      userSettings.ui.directConnections.OPENAI_API_BASE_URLS = ["https://proxy.chat.matthiaz.dev/proxy/v1"];
+      userSettings.ui.directConnections.OPENAI_API_BASE_URLS = [`https://${process.env.PROXY_URL}/proxy/v1`];
       userSettings.ui.directConnections.OPENAI_API_KEYS = [apiKey];
       userSettings.ui.directConnections.OPENAI_API_CONFIGS["0"].enable = true;
       userSettings.ui.directConnections.OPENAI_API_CONFIGS["0"].connection_type = "external";
